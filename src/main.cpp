@@ -1,50 +1,91 @@
-#include "wifi.h"
-// #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <string>
+#include <HardwareSerial.h>
+#include "BluetoothSerial.h"
 
 const int SERIAL_BAUD = 9600;
-const String ssid = "";
-const String password = "";
+const char* DEVICE_NAME = "ESP-Monitor";
+const int LDC_WITDH = 16;
+const int LDC_HEIGHT = 2;
 
 struct Data {
   String firstLine;
   String secondLine;
 };
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-void print(String firstLine, String secondLine);
-Data fetchData();
+void connectBT();
+Data* readData();
+void update(Data* data);
+
+LiquidCrystal_I2C lcd(0x26, LDC_WITDH, LDC_HEIGHT);
+BluetoothSerial serialBt;
+
+Data data = {
+  "",
+  ""
+};
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
+
   lcd.init();
   lcd.backlight();
 
-  print("Wifi", "Connecting...");
-  wifiConnect(ssid, password);
+  connectBT();
 }
 
 void loop() {
-  Data data = fetchData();
+  delay(5000);
+  return;
 
-  print(data.firstLine, data.secondLine);
+  if (!serialBt.available()) {
+    delay(5000);
+    return;
+  }
 
-  delay(2250);
+  update(readData());
 }
 
-void print(String firstLine, String secondLine = "") {
+void connectBT() {
+  Serial.println("Connecting to Bluetooth");
+
+  serialBt.begin(DEVICE_NAME);
+  data.firstLine = "Bluetooth waiting for pairing";
+  data.secondLine = DEVICE_NAME;
+  update(&data);
+}
+
+Data* readData() {
+  Serial.println("Reading data");
+
+  String* buffer = &data.firstLine;
+  buffer->clear();
+
+  while (serialBt.available()) {
+    char read = serialBt.read();
+    if (read == '\n') {
+      break;
+    }
+
+    if (read == ';') {
+      buffer = &data.secondLine;
+      buffer->clear();
+      continue;
+    }
+
+    buffer += read;
+  }
+
+  return &data;
+}
+
+void update(Data* data) {
   lcd.clear();
+
   lcd.setCursor(0, 0);
-  lcd.print(firstLine);
+  lcd.print(data->firstLine.c_str());
   lcd.setCursor(0, 1);
-  lcd.print(secondLine);
+  lcd.print(data->secondLine.c_str());
+
+  // TODO: Enable/disable pins
 }
-
-
-Data fetchData() {
-  return {
-    "Hello, World!",
-    "This is a test"
-  };
-}
-
