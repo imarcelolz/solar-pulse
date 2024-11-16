@@ -5,27 +5,34 @@
 
 const String DEVICE_NAME = "ESP-Monitor";
 const int BRIGHTNESS = 2;
+// const int LCD_ADDR = 0x27;
 const int LDC_HEIGHT = 2;
 const int LDC_WITDH = 16;
-const int LOOP_DELAY = 500;
+const int LOOP_DELAY = 1000;
 const int SERIAL_BAUD = 9600;
+const int LED_COUNT = 4;
+const int LED_PINS[4] = {2, 4, 16, 17};
 
 struct Data {
   String firstLine;
   String secondLine;
+  bool leds[4];
 };
 
 void connectBT();
 void setPaitingMessage();
-Data* readData();
-void update(Data* data);
+void updateDisplay(Data* data);
+void readData(Data* data);
+void debugData(Data* data);
+void scanI2C();
 
 LiquidCrystal_I2C lcd(0x27, LDC_WITDH, LDC_HEIGHT);
 BluetoothSerial serialBt;
 
 Data data = {
   "",
-  ""
+  "",
+  {false, false, false, false}
 };
 
 
@@ -35,56 +42,36 @@ void setup() {
   lcd.init();
   lcd.backlight();
 
-  connectBT();
-  // lcd.clear();
-
-  // lcd.setCursor(0, 0);
-  // lcd.print("Abacateiro");
-  // lcd.setCursor(0, 1);
-  // lcd.print("Juvelino");
-}
-
-void loop() {
-
-  // Serial.print(".");
-  // Serial.print(data.firstLine + " ");
-  // Serial.println(data.secondLine);
-
-  // if (serialBt.available()) {
-  //   update(readData());
-  // }
-
-  // if (!serialBt.hasClient()) {
-  //   connectBT();
-  // }
-
-  delay(LOOP_DELAY);
-}
-
-void setPaitingMessage() {
-  data.firstLine = "BT pair with";
-  data.secondLine = DEVICE_NAME;
-
-  update(&data);
-}
-
-void connectBT() {
   Serial.println("Connecting to Bluetooth");
-
   serialBt.begin(DEVICE_NAME);
   setPaitingMessage();
 }
 
-Data* readData() {
-  Serial.println("Reading data");
+void loop() {
+  scanI2C();
+  if(serialBt.available()) {
+    Serial.println("Data available");
+    readData(&data);
+    updateDisplay(&data);
+    debugData(&data);
+  }
 
-  data.firstLine = serialBt.readStringUntil(';');
-  data.secondLine = serialBt.readStringUntil('\n');
-
-  return &data;
+  delay(LOOP_DELAY);
 }
 
-void update(Data* data) {
+void readData(Data* data) {
+  String ledBuffer = serialBt.readStringUntil(';');
+  String firstLine = serialBt.readStringUntil(';');
+  String secondLine = serialBt.readStringUntil('\n');
+
+  data->firstLine = firstLine;
+  data->secondLine = secondLine.substring(0, secondLine.length() - 1);
+  for(int i = 0; i < LED_COUNT; i++) {
+    data->leds[i] = ledBuffer[i] == '1';
+  }
+}
+
+void updateDisplay(Data* data) {
   lcd.clear();
 
   lcd.setCursor(0, 0);
@@ -93,4 +80,51 @@ void update(Data* data) {
   lcd.print(data->secondLine);
 
   // TODO: Enable/disable pins
+}
+
+void debugData(Data* data) {
+  Serial.println(data->firstLine);
+  Serial.println(data->secondLine);
+  for(int i = 0; i < LED_COUNT; i++) {
+    Serial.println(data->leds[i]);
+  }
+}
+
+void setPaitingMessage() {
+  data.firstLine = "BT pair with";
+  data.secondLine = DEVICE_NAME;
+
+  updateDisplay(&data);
+}
+
+void scanI2C() {
+  byte error, address;
+  int nDevices;
+  Serial.println("Scanning...");
+  nDevices = 0;
+  for(address = 1; address < 127; address++ ) {
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+      nDevices++;
+    }
+    else if (error==4) {
+      Serial.print("Unknow error at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+    }    
+  }
+  if (nDevices == 0) {
+    Serial.println("No I2C devices found\n");
+  }
+  else {
+    Serial.println("done\n");
+  }
 }
