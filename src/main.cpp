@@ -11,7 +11,7 @@ const int LDC_WITDH = 16;
 const int LOOP_DELAY = 1000;
 const int SERIAL_BAUD = 9600;
 const int LED_COUNT = 4;
-const int LED_PINS[4] = {2, 4, 16, 17};
+const int LED_PINS[4] = {13, 12, 14, 27};
 
 struct Data {
   String firstLine;
@@ -45,15 +45,25 @@ void setup() {
   Serial.println("Connecting to Bluetooth");
   serialBt.begin(DEVICE_NAME);
   setPaitingMessage();
+
+  for(int i = 0; i < LED_COUNT; i++) {
+    pinMode(LED_PINS[i], OUTPUT);
+    digitalWrite(LED_PINS[i], HIGH);
+  }
 }
 
 void loop() {
-  scanI2C();
+  // scanI2C();
+
   if(serialBt.available()) {
     Serial.println("Data available");
     readData(&data);
     updateDisplay(&data);
     debugData(&data);
+  }
+
+  if(!serialBt.connected()) {
+    setPaitingMessage();
   }
 
   delay(LOOP_DELAY);
@@ -75,11 +85,14 @@ void updateDisplay(Data* data) {
   lcd.clear();
 
   lcd.setCursor(0, 0);
+  debugData(data);
   lcd.print(data->firstLine);
   lcd.setCursor(0, 1);
   lcd.print(data->secondLine);
 
-  // TODO: Enable/disable pins
+  for(int i = 0; i < LED_COUNT; i++) {
+    digitalWrite(LED_PINS[i], data->leds[i] ? HIGH : LOW);
+  }
 }
 
 void debugData(Data* data) {
@@ -119,7 +132,7 @@ void scanI2C() {
         Serial.print("0");
       }
       Serial.println(address,HEX);
-    }    
+    }
   }
   if (nDevices == 0) {
     Serial.println("No I2C devices found\n");
