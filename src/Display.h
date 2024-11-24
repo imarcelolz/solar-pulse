@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Wire.h>
 #include <Adafruit_SSD1306.h>
-#include "lib.h"
+#include <Wire.h>
+#include <WString.h>
 
 #define DISPLAY_HEIGHT 32
 #define DISPLAY_WITDH 128

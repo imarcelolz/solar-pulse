@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Wire.h>
 #include <HardwareSerial.h>
-#include <string>
+#include <Wire.h>
+#include <WString.h>
 
 void i2cScaner();
 
