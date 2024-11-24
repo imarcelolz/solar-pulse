@@ -22,19 +22,52 @@ void Display::begin()
     }
 }
 
-void Display::update(Data* data)
+void Display::refresh()
 {
     this->display->clearDisplay();
 
     this->display->setCursor(0, 0);
-    this->display->println(data->firstLine);
+    this->display->println(this->data.firstLine);
 
     this->display->setCursor(0, LINE_HEIGHT);
-    this->display->println(data->secondLine);
+    this->display->println(this->data.secondLine);
 
     display->display();
 
     for (int i = 0; i < LED_COUNT; i++) {
-        digitalWrite(this->ledPins[i], data->leds[i] ? HIGH : LOW);
+        digitalWrite(this->ledPins[i], this->data.leds[i] ? HIGH : LOW);
     }
+}
+
+void Display::updateFirstLine(String line, bool refresh) {
+    this->data.firstLine = line;
+
+    if(refresh) {
+        this->refresh();
+    }
+}
+
+void Display::updateSecondLine(String line, bool refresh) {
+    this->data.secondLine = line;
+
+    if(refresh) {
+        this->refresh();
+    }
+}
+
+void Display::updateLeds(bool led1, bool led2, bool led3, bool led4, bool refresh) {
+    this->data.leds[0] = led1;
+    this->data.leds[1] = led2;
+    this->data.leds[3] = led3;
+    this->data.leds[3] = led4;
+
+    if(refresh) {
+        this->refresh();
+    }
+}
+
+void Display::update(Data data, bool refresh) {
+    this->data.firstLine = data.firstLine;
+    this->data.secondLine = data.secondLine;
+    this->updateLeds(data.leds[0], data.leds[1], data.leds[2], data.leds[3], refresh);
 }

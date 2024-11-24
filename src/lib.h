@@ -6,8 +6,3 @@
 
 void i2cScaner();
 
-struct Data {
-    String firstLine;
-    String secondLine;
-    bool leds[4];
-};
