@@ -1,5 +1,6 @@
-#include <BluetoothSerial.h>
 #include <HardwareSerial.h>
+
+#include <WiFiManager.h> 
 
 #include "Display.h"
 #include "lib.h"
@@ -16,20 +17,27 @@ void setPaitingMessage();
 int ledPins[4] = { 0, 1, 2, 3 };
 Display display(&Wire, SCREEN_ADDRESS, ledPins);
 Data data = { "", "", { false, false, false, false } };
+WiFiManager wifiManager;
 
 void setup()
 {
     Serial.begin();
     Wire.begin(20, 21);
-
     display.begin();
 
-    // serialBt.begin(DEVICE_NAME);
-    setPaitingMessage();
+    wifiManager.setConfigPortalBlocking(false);
+    wifiManager.setConfigPortalTimeout(500);
+    wifiManager.autoConnect(DEVICE_NAME);
 }
+
+
+// Chip is ESP32-C3 (QFN32) (revision v0.4)
+// Features: WiFi, BLE, Embedded Flash 4MB (XMC)
 
 void loop()
 {
+    wifiManager.process();
+ 
     // if (serialBt.available()) {
     //     Serial.println("Data available");
     //     readData(&data);
@@ -37,12 +45,19 @@ void loop()
     //     dataDebug(&data);
     // }
 
+
     // if (!serialBt.connected()) {
     //     setPaitingMessage();
     // }
 
     delay(LOOP_DELAY);
 }
+
+
+
+
+
+
 
 void readData(Data* data)
 {

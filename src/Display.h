@@ -12,14 +12,13 @@
 #define TEXT_SIZE 1
 
 class Display {
+    Adafruit_SSD1306 *display;
+    int address;
+    int ledPins[LED_COUNT];
+
     public:
     Display(TwoWire* wire, int address, int ledPins[LED_COUNT]);
 
     void begin();
     void update(Data* data);
-
-    private:
-    int address;
-    int ledPins[LED_COUNT];
-    Adafruit_SSD1306 *display;
 };
