@@ -1,3 +1,4 @@
+
 #include <mainEvents.h>
 
 int ledPins[4] = {0, 1, 2, 3};
@@ -5,10 +6,12 @@ int ledPins[4] = {0, 1, 2, 3};
 Display display(&Wire, SCREEN_ADDRESS, ledPins);
 WiFiManager wifiManager;
 
-WebServer* webServer = NULL;
+AsyncWebServer webServer(80);
 
-void webserverOnData();
-void webServerOnNotFound();
+void webserverOnData(AsyncWebServerRequest *request);
+void webserverOnPostData(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+void webServerOnNotFound(AsyncWebServerRequest *request);
+
 void updateDisplay(String data);
 
 int onBooting() {
@@ -16,46 +19,51 @@ int onBooting() {
   Wire.begin(20, 21);
 
   display.begin();
-  display.updateFirstLine("What's up!", true);
+  display.updateFirstLine("Booting", true);
 
+  wifiManager.setHttpPort(WIFI_MANAGER_PORT);
   wifiManager.setConfigPortalTimeout(WIFI_CONNECT_TIMEOUT_SECONDS);
   wifiManager.setConnectTimeout(WIFI_PORTAL_TIMEOUT_SECONDS);
   wifiManager.setConfigPortalBlocking(false);
 
+  webServer.on("/api", HTTP_GET, webserverOnData);
+  webServer.on("/api", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, webserverOnPostData);
+
+  webServer.onNotFound(webServerOnNotFound);
+
   return (int)STATE_WIFI_SETUP;
 }
 
-WebServer* createWebserver() {
-  auto newServer = new WebServer(80);
+int onMain() {
+  delay(200);
 
-  newServer->on("/api", webserverOnData);
-  newServer->onNotFound(webServerOnNotFound);
+  auto nextState = WiFi.isConnected() ? STATE_MAIN : STATE_WIFI_SETUP;
 
-  newServer->begin();
-
-  return newServer;
+  return (int)nextState;
 }
 
-int onMain() {
-  if (webServer == NULL) {
-    webServer = createWebserver();
+void webserverOnData(AsyncWebServerRequest *request) {
+  Serial.println("webserverOnData");
+
+  request->send(200, "text/plain", "Ok");
+  updateDisplay(request->arg("data"));
+}
+
+void webserverOnPostData(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  if (total != display.totalSize()) {
+    request->send(500, "text/plain", "The total does not match the display size");
+    return;
   }
 
-  webServer->handleClient();
+  display.updateBitmap(data, true);
 
-  return (int)STATE_MAIN;
+  request->send(200, "text/plain", "Ok");
 }
 
-void webserverOnData() {
-  Serial.println("webserverOnData");
-  updateDisplay(webServer->arg("data"));
-
-  webServer->send(200, "text/plain", "Ok");
-}
-
-void webServerOnNotFound() {
+void webServerOnNotFound(AsyncWebServerRequest *request) {
   Serial.println("webServerOnNotFound");
-  webServer->send(404, "text/plain", "Not found");
+
+  request->send(404, "text/plain", "Not found");
 }
 
 void updateDisplay(String data) {
@@ -85,20 +93,22 @@ void updateDisplay(String data) {
 
 int onWifiSetup() {
   auto wifiConnected = []() {
-    String uri = "http://" + WiFi.localIP().toString() + "/api";
-    display.updateFirstLine("Connected!!");
-    display.updateSecondLine(uri, true);
+    webServer.begin();
+
+    display.updateFirstLine("Connected!");
+    display.updateSecondLine(WiFi.localIP().toString(), true);
 
     return (int)STATE_MAIN;
   };
 
-  display.updateFirstLine("I'm trying to connect to wifi", true);
+  webServer.end();
+  display.updateFirstLine("Connecting", true);
 
   if (wifiManager.autoConnect(DEVICE_NAME)) {
     return wifiConnected();
   }
 
-  display.updateFirstLine("Setup me in via wifi");
+  display.updateFirstLine("Setup me in");
   display.updateSecondLine(DEVICE_NAME, true);
 
   while (!WiFi.isConnected()) {

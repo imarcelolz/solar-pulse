@@ -9,7 +9,7 @@
 #define LED_COUNT 4
 #define LINE_HEIGHT 16
 #define OLED_RESET -1
-#define TEXT_SIZE 1
+#define TEXT_SIZE 2
 
 struct Data {
   String firstLine;
@@ -31,5 +31,8 @@ class Display {
   void updateSecondLine(String line, bool refresh = false);
   void updateLeds(bool led1, bool led2, bool led3, bool led4, bool refresh = false);
   void update(Data data, bool refresh = false);
+  void updateBitmap(uint8_t* data, bool refresh = false);
+  size_t totalSize();
+
   void refresh();
 };
