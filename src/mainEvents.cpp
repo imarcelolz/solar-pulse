@@ -50,14 +50,12 @@ void webserverOnData(AsyncWebServerRequest *request) {
 }
 
 void webserverOnPostData(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-  if (total != display.totalSize()) {
-    request->send(500, "text/plain", "The total does not match the display size");
-    return;
-  }
-
-  display.updateBitmap(data, true);
+  Serial.println("webserverOnPostData");
 
   request->send(200, "text/plain", "Ok");
+  Bitmap *bitmap = Bitmap::fromBuffer(data);
+  std::cout << bitmap;
+  // display.updateBitmap(data, true);
 }
 
 void webServerOnNotFound(AsyncWebServerRequest *request) {
@@ -117,3 +115,7 @@ int onWifiSetup() {
 
   return wifiConnected();
 }
+
+// curl -X POST http://192.168.0.201/api \
+//   -H "Content-Type:application/octet-stream" \
+//   --data-binary @image.bpm

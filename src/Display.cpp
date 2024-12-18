@@ -70,9 +70,15 @@ void Display::update(Data data, bool refresh) {
 }
 
 void Display::updateBitmap(uint8_t* bitmap, bool refresh) {
+  Bitmap* bmp = Bitmap::fromBuffer(bitmap);
+
   this->display->clearDisplay();
   this->display->drawBitmap(
-      0, 0, bitmap, DISPLAY_WITDH, DISPLAY_HEIGHT, 1);
+      0, 0, bmp->bytes(),
+      DISPLAY_WITDH,
+      DISPLAY_HEIGHT,
+      1);
+
   display->display();
 }
 

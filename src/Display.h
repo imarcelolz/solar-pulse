@@ -4,6 +4,8 @@
 #include <WString.h>
 #include <Wire.h>
 
+#include "Bitmap.h"
+
 #define DISPLAY_HEIGHT 32
 #define DISPLAY_WITDH 128
 #define LED_COUNT 4
