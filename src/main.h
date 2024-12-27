@@ -12,9 +12,10 @@
 #include <ESPAsyncWebServer.h>
 #endif
 
-#include "Display.h"
+#include "lib/Display.h"
+#include "lib/StateMachine.h"
 
-#define DEVICE_NAME "ESP-Monitor"
+#define DEVICE_NAME "Display"
 #define SCREEN_ADDRESS 0x3C
 #define LOOP_DELAY 1000
 #define WIFI_CONNECT_TIMEOUT_SECONDS 30
@@ -30,7 +31,10 @@ enum State {
 };
 
 int onBooting();
-int onWifiSetup();
 int onMain();
-
+int onWifiSetup();
 void onApiData(String data);
+
+void updateDisplay(String data);
+void webserverOnData(AsyncWebServerRequest *request);
+void webServerOnNotFound(AsyncWebServerRequest *request);
