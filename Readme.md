@@ -45,6 +45,20 @@ This project allows you to set up an ESP32 device to display text information on
 
 5. Once connected, the device will display its IP address on the OLED display.
 
+### Environment Variables
+The following arguments can be set in the platform.ini build flags for extended configuration.
+
+* DISPLAY_HEIGHT: Display height in pixels
+* DISPLAY_WITDH: Display width in pixels
+* DISPLAY_LINE_HEIGHT: Height of a line in pixels
+* DISPLAY_TEXT_SIZE: Text size in pixels, 1 or 2
+* I2C_SCREEN_ADDRESS: The i2c address of the oled screen.
+* LED_PIN_0: Led 1 pin
+* LED_PIN_1 Led 2 pin
+* LED_PIN_2 Led 3 pin
+* LED_PIN_3 Led 4 pin
+* WIFI_DEVICE_NAME: Wifi device name
+
 ### API
 
 You can update the display content using a simple HTTP GET request.
@@ -64,3 +78,5 @@ You can update the display content using a simple HTTP GET request.
 ```sh
 curl "http://<device_ip>/api?data=0000;Hello;World"
 ```
+
+

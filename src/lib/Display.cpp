@@ -1,20 +1,20 @@
 #include "Display.h"
 
-Display::Display(TwoWire* wire, int address, int ledPins[LED_COUNT]) {
+Display::Display(TwoWire* wire, int address, int ledPins[DISPLAY_LED_COUNT]) {
   this->address = address;
   this->display = new Adafruit_SSD1306(DISPLAY_WITDH, DISPLAY_HEIGHT, wire);
 
-  for (int i = 0; i < LED_COUNT; i++) {
+  for (int i = 0; i < DISPLAY_LED_COUNT; i++) {
     this->ledPins[i] = ledPins[i];
   }
 }
 
 void Display::begin() {
   this->display->begin(SSD1306_SWITCHCAPVCC, this->address);
-  this->display->setTextSize(TEXT_SIZE);
+  this->display->setTextSize(DISPLAY_TEXT_SIZE);
   this->display->setTextColor(SSD1306_WHITE);
 
-  for (int i = 0; i < LED_COUNT; i++) {
+  for (int i = 0; i < DISPLAY_LED_COUNT; i++) {
     pinMode(this->ledPins[i], OUTPUT);
     digitalWrite(ledPins[i], LOW);
   }
@@ -26,12 +26,12 @@ void Display::refresh() {
   this->display->setCursor(0, 0);
   this->display->println(this->data.firstLine);
 
-  this->display->setCursor(0, LINE_HEIGHT);
+  this->display->setCursor(0, DISPLAY_LINE_HEIGHT);
   this->display->println(this->data.secondLine);
 
   display->display();
 
-  for (int i = 0; i < LED_COUNT; i++) {
+  for (int i = 0; i < DISPLAY_LED_COUNT; i++) {
     digitalWrite(this->ledPins[i], this->data.leds[i] ? HIGH : LOW);
   }
 }

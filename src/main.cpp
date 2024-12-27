@@ -1,6 +1,6 @@
 #include <main.h>
 
-int ledPins[4] = {0, 1, 2, 3};
+int ledPins[4] = {LED_PIN_0, LED_PIN_1, LED_PIN_2, LED_PIN_3};
 
 Display display(&Wire, SCREEN_ADDRESS, ledPins);
 WiFiManager wifiManager;
@@ -57,12 +57,12 @@ int onWifiSetup() {
   webServer.end();
   display.updateFirstLine("Connecting", true);
 
-  if (wifiManager.autoConnect(DEVICE_NAME)) {
+  if (wifiManager.autoConnect(WIFI_DEVICE_NAME)) {
     return wifiConnected();
   }
 
   display.updateFirstLine("Setup me in");
-  display.updateSecondLine(DEVICE_NAME, true);
+  display.updateSecondLine(WIFI_DEVICE_NAME, true);
 
   while (!WiFi.isConnected()) {
     wifiManager.process();

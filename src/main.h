@@ -15,12 +15,16 @@
 #include "lib/Display.h"
 #include "lib/StateMachine.h"
 
-#define DEVICE_NAME "Esp32 Display"
-#define SCREEN_ADDRESS 0x3C
+#define I2C_SCREEN_ADDRESS 0x3C
+#define LED_PIN_0 0
+#define LED_PIN_1 1
+#define LED_PIN_2 2
+#define LED_PIN_3 3
 #define LOOP_DELAY 1000
 #define WIFI_CONNECTION_TIMEOUT_SECONDS 30
-#define WIFI_PORTAL_TIMEOUT_SECONDS 30
+#define WIFI_DEVICE_NAME ""
 #define WIFI_PORTAL_PORT 81
+#define WIFI_PORTAL_TIMEOUT_SECONDS 30
 
 enum State {
   STATE_UNDEFINED = 0,
