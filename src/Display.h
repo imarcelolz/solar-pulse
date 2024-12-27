@@ -4,8 +4,6 @@
 #include <WString.h>
 #include <Wire.h>
 
-#include "Bitmap.h"
-
 #define DISPLAY_HEIGHT 32
 #define DISPLAY_WITDH 128
 #define LED_COUNT 4
@@ -33,7 +31,6 @@ class Display {
   void updateSecondLine(String line, bool refresh = false);
   void updateLeds(bool led1, bool led2, bool led3, bool led4, bool refresh = false);
   void update(Data data, bool refresh = false);
-  void updateBitmap(uint8_t* data, bool refresh = false);
   size_t totalSize();
 
   void refresh();

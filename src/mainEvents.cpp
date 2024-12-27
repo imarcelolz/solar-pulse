@@ -27,8 +27,6 @@ int onBooting() {
   wifiManager.setConfigPortalBlocking(false);
 
   webServer.on("/api", HTTP_GET, webserverOnData);
-  webServer.on("/api", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, webserverOnPostData);
-
   webServer.onNotFound(webServerOnNotFound);
 
   return (int)STATE_WIFI_SETUP;
@@ -47,15 +45,6 @@ void webserverOnData(AsyncWebServerRequest *request) {
 
   request->send(200, "text/plain", "Ok");
   updateDisplay(request->arg("data"));
-}
-
-void webserverOnPostData(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-  Serial.println("webserverOnPostData");
-
-  request->send(200, "text/plain", "Ok");
-  Bitmap *bitmap = Bitmap::fromBuffer(data);
-  std::cout << bitmap;
-  // display.updateBitmap(data, true);
 }
 
 void webServerOnNotFound(AsyncWebServerRequest *request) {

@@ -69,19 +69,6 @@ void Display::update(Data data, bool refresh) {
   this->updateLeds(data.leds[0], data.leds[1], data.leds[2], data.leds[3], refresh);
 }
 
-void Display::updateBitmap(uint8_t* bitmap, bool refresh) {
-  Bitmap* bmp = Bitmap::fromBuffer(bitmap);
-
-  this->display->clearDisplay();
-  this->display->drawBitmap(
-      0, 0, bmp->bytes(),
-      DISPLAY_WITDH,
-      DISPLAY_HEIGHT,
-      1);
-
-  display->display();
-}
-
 size_t Display::totalSize() {
   return DISPLAY_HEIGHT * DISPLAY_WITDH;
 }
