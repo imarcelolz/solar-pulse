@@ -25,8 +25,8 @@ int onBooting() {
   display.begin();
   display.updateFirstLine("Booting", true);
 
-  wifiManager.setHttpPort(WIFI_MANAGER_PORT);
-  wifiManager.setConfigPortalTimeout(WIFI_CONNECT_TIMEOUT_SECONDS);
+  wifiManager.setHttpPort(WIFI_PORTAL_PORT);
+  wifiManager.setConfigPortalTimeout(WIFI_CONNECTION_TIMEOUT_SECONDS);
   wifiManager.setConnectTimeout(WIFI_PORTAL_TIMEOUT_SECONDS);
   wifiManager.setConfigPortalBlocking(false);
 
