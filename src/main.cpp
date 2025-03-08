@@ -9,6 +9,8 @@ AsyncWebServer webServer(80);
 StateMachine stateMachine(STATE_BOOTING, STATE_FATAL_ERROR);
 
 void setup() {
+  delay(500);
+
   stateMachine.addEvent(STATE_BOOTING, onBooting);
   stateMachine.addEvent(STATE_WIFI_SETUP, onWifiSetup);
   stateMachine.addEvent(STATE_MAIN, onMain);
@@ -19,16 +21,20 @@ void loop() {
 }
 
 int onBooting() {
+  delay(500);
+
   Serial.begin();
   Wire.begin(20, 21);
 
   display.begin();
+  display.setFontSize(SMALL);
   display.updateFirstLine("Booting", true);
 
-  wifiManager.setHttpPort(WIFI_PORTAL_PORT);
+  wifiManager.setConfigPortalBlocking(false);
   wifiManager.setConfigPortalTimeout(WIFI_CONNECTION_TIMEOUT_SECONDS);
   wifiManager.setConnectTimeout(WIFI_PORTAL_TIMEOUT_SECONDS);
-  wifiManager.setConfigPortalBlocking(false);
+  wifiManager.setHttpPort(WIFI_PORTAL_PORT);
+  wifiManager.setWiFiAPHidden(false);
 
   webServer.on("/api", HTTP_GET, webserverOnData);
   webServer.onNotFound(webServerOnNotFound);
@@ -61,11 +67,13 @@ int onWifiSetup() {
     return wifiConnected();
   }
 
-  display.updateFirstLine("Setup me in");
+  display.setFontSize(SMALL);
+  display.updateFirstLine("Connect to wifi");
   display.updateSecondLine(WIFI_DEVICE_NAME, true);
 
   while (!WiFi.isConnected()) {
     wifiManager.process();
+    delay(10);
   }
 
   return wifiConnected();
@@ -105,6 +113,7 @@ void updateDisplay(String data) {
       data[2] == '1',
       data[3] == '1');
 
+  display.setFontSize(LARGE);
   display.updateFirstLine(buffer[0]);
   display.updateSecondLine(buffer[1], true);
 }

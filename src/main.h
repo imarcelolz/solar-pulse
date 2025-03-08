@@ -21,10 +21,12 @@
 #define LED_PIN_2 2
 #define LED_PIN_3 3
 #define LOOP_DELAY 1000
-#define WIFI_CONNECTION_TIMEOUT_SECONDS 30
-#define WIFI_DEVICE_NAME ""
+#define WIFI_CONNECTION_TIMEOUT_SECONDS 300
+#define WIFI_DEVICE_NAME "monitor-cozinha"
 #define WIFI_PORTAL_PORT 81
 #define WIFI_PORTAL_TIMEOUT_SECONDS 30
+#define WIFI_SSID "MoguekoWireless"
+#define WIFI_SSID_PASSWORD "#bratraquiana123#"
 
 enum State {
   STATE_UNDEFINED = 0,

@@ -2,7 +2,7 @@
 
 Display::Display(TwoWire* wire, int address, int ledPins[DISPLAY_LED_COUNT]) {
   this->address = address;
-  this->display = new Adafruit_SSD1306(DISPLAY_WITDH, DISPLAY_HEIGHT, wire);
+  this->display = new Adafruit_SSD1306(DISPLAY_WIDTH, DISPLAY_HEIGHT, wire);
 
   for (int i = 0; i < DISPLAY_LED_COUNT; i++) {
     this->ledPins[i] = ledPins[i];
@@ -11,7 +11,7 @@ Display::Display(TwoWire* wire, int address, int ledPins[DISPLAY_LED_COUNT]) {
 
 void Display::begin() {
   this->display->begin(SSD1306_SWITCHCAPVCC, this->address);
-  this->display->setTextSize(DISPLAY_TEXT_SIZE);
+  this->setFontSize((FontSize) DISPLAY_TEXT_SIZE);
   this->display->setTextColor(SSD1306_WHITE);
 
   for (int i = 0; i < DISPLAY_LED_COUNT; i++) {
@@ -70,5 +70,9 @@ void Display::update(Data data, bool refresh) {
 }
 
 size_t Display::totalSize() {
-  return DISPLAY_HEIGHT * DISPLAY_WITDH;
+  return DISPLAY_HEIGHT * DISPLAY_WIDTH;
+}
+
+void Display::setFontSize(FontSize size) {
+  this->display->setTextSize(size);
 }

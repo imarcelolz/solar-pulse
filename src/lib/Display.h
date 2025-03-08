@@ -5,7 +5,7 @@
 #include <Wire.h>
 
 #define DISPLAY_HEIGHT 32
-#define DISPLAY_WITDH 128
+#define DISPLAY_WIDTH 128
 #define DISPLAY_LED_COUNT 4
 #define DISPLAY_LINE_HEIGHT 16
 #define DISPLAY_OLED_RESET -1
@@ -15,6 +15,11 @@ struct Data {
   String firstLine;
   String secondLine;
   bool leds[DISPLAY_LED_COUNT];
+};
+
+enum FontSize {
+  SMALL = 1,
+  LARGE = 2
 };
 
 class Display {
@@ -34,4 +39,5 @@ class Display {
   size_t totalSize();
 
   void refresh();
+  void setFontSize(FontSize size);
 };
